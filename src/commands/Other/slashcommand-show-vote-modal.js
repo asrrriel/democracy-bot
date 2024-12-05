@@ -4,13 +4,13 @@ const ApplicationCommand = require("../../structure/ApplicationCommand");
 
 module.exports = new ApplicationCommand({
     command: {
-        name: 'show-modal',
-        description: '[TESTING COMMAND] Opens a modal.',
+        name: 'request-change',
+        description: 'lets you make a vote',
         type: 1,
         options: []
     },
     options: {
-        botDevelopers: true
+        cooldown: 5000
     },
     /**
      * 
@@ -20,18 +20,18 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         await interaction.showModal(
             {
-                custom_id: 'example-modal-id',
-                title: 'Example Modal',
+                custom_id: 'vote-modal',
+                title: 'Make a vote!',
                 components: [{
                     type: 1,
                     components: [{
                         type: 4,
-                        custom_id: 'example-modal-id-field-1',
-                        label: 'What is your Discord username?',
+                        custom_id: 'name',
+                        label: 'Name the asdfasdf',
                         max_length: 15,
                         min_length: 2,
-                        placeholder: 'Enter your username here!',
-                        style: 1,
+                        placeholder: 'swa swa swa',
+                        style: 2,
                         required: true
                     }]
                 }]
