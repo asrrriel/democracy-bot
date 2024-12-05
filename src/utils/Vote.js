@@ -1,20 +1,7 @@
-const { ModalSubmitInteraction, Poll, Collection } = require("discord.js");
-const DiscordBot = require("../../client/DiscordBot");
-const Component = require("../../structure/Component");
 const config = require("../../config");
 
-module.exports = new Component({
-    customId: 'vote-modal',
-    type: 'modal',
-    /**
-     * 
-     * @param {DiscordBot} client 
-     * @param {ModalSubmitInteraction} interaction 
-     */
-    run: async (client, interaction) => {
-
-        const name = interaction.fields.getTextInputValue('name');
-
+module.exports = {
+    async create_vote(client, name) {
         const forum = await client.channels.fetch(config.channels.votes);
 
         const thread = await forum.threads.create({
@@ -39,11 +26,6 @@ module.exports = new Component({
                 layoutType: 1, // there are no layouts other than 1
             },
         });
-
-        await interaction.reply({
-            content: 'Hello **' + name + '**.',
-            ephemeral: true
-        });
-
     }
-}).toJSON();
+
+}

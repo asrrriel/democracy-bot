@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, ApplicationCommandOptionType } = require("discord.js");
+const discord = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
@@ -18,24 +18,37 @@ module.exports = new ApplicationCommand({
      * @param {ChatInputCommandInteraction} interaction 
      */
     run: async (client, interaction) => {
-        await interaction.showModal(
-            {
-                custom_id: 'vote-modal',
-                title: 'Make a vote!',
-                components: [{
-                    type: 1,
-                    components: [{
-                        type: 4,
-                        custom_id: 'name',
-                        label: 'Name the asdfasdf',
-                        max_length: 15,
-                        min_length: 2,
-                        placeholder: 'swa swa swa',
-                        style: 2,
-                        required: true
-                    }]
-                }]
-            }
-        )
+        await interaction.reply({
+            content: 'What kind of action do you want to request?',
+            components: [
+                new discord.ActionRowBuilder()
+			        .addComponents(new discord.StringSelectMenuBuilder()
+                        .setCustomId('vote-type')
+                        .setPlaceholder('Select an option')
+                        .addOptions([
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Promotion')
+                            .setValue('promo'),
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Demotion')
+                            .setValue('demo'),
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Kick')
+                            .setValue('kick'),
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Ban')
+                            .setValue('ban'),
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Mute')
+                            .setValue('mute'),
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Unmute')
+                            .setValue('unmute'),
+                            new discord.StringSelectMenuOptionBuilder()
+                            .setLabel('Unban')
+                            .setValue('unban'),
+                ]))
+            ]
+        });
     }
 }).toJSON();
