@@ -1,6 +1,7 @@
 const { ModalSubmitInteraction, Poll, Collection } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const Component = require("../../structure/Component");
+const config = require("../../config");
 
 module.exports = new Component({
     customId: 'vote-modal',
@@ -14,7 +15,7 @@ module.exports = new Component({
 
         const name = interaction.fields.getTextInputValue('name');
 
-        const forum = await client.channels.fetch("1314256997549605017")
+        const forum = await client.channels.fetch(config.channels.votes);
 
         const thread = await forum.threads.create({
             name: name,
