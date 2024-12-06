@@ -4,6 +4,7 @@ const { readdirSync } = require('fs');
 const DiscordBot = require('../DiscordBot');
 const ApplicationCommand = require('../../structure/ApplicationCommand');
 const MessageCommand = require('../../structure/MessageCommand');
+const config = require('../../config');
 
 class CommandsHandler {
     client;
@@ -77,14 +78,10 @@ class CommandsHandler {
      * @param {{ enabled: boolean, guildId: string }} development
      * @param {Partial<import('discord.js').RESTOptions>} restOptions 
      */
-    registerApplicationCommands = async (development, restOptions = null) => {
+    registerApplicationCommands = async ( restOptions = null) => {
         const rest = new REST(restOptions ? restOptions : { version: '10' }).setToken(this.client.token);
 
-        if (development.enabled) {
-            await rest.put(Routes.applicationGuildCommands(this.client.user.id, development.guildId), { body: this.client.rest_application_commands_array });
-        } else {
-            await rest.put(Routes.applicationCommands(this.client.user.id), { body: this.client.rest_application_commands_array });
-        }
+        await rest.put(Routes.applicationGuildCommands(this.client.user.id, config.guildId), { body: this.client.rest_application_commands_array });
     }
 }
 

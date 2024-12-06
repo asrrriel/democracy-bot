@@ -1,6 +1,7 @@
 const discord = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const config = require("../../config");
 
 module.exports = new ApplicationCommand({
     command: {
@@ -15,9 +16,18 @@ module.exports = new ApplicationCommand({
     /**
      * 
      * @param {DiscordBot} client 
-     * @param {ChatInputCommandInteraction} interaction 
+     * @param {import("discord.js").ChatInputCommandInteraction} interaction 
      */
     run: async (client, interaction) => {
+        if (interaction.channel.type === discord.ChannelType.DM || interaction.guildId !== config.guildId) {
+            interaction.reply({
+                content: 'This command can only be used in **' + config.guildName + '**',
+                ephemeral: true
+            })
+            return;
+        }
+
+
         await interaction.reply({
             content: 'What kind of action do you want to request?',
             components: [
@@ -48,7 +58,9 @@ module.exports = new ApplicationCommand({
                             .setLabel('Unban')
                             .setValue('unban'),
                 ]))
-            ]
+            ],
+            ephemeral: true 
         });
+
     }
 }).toJSON();

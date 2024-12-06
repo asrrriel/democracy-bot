@@ -6,6 +6,7 @@ fs.writeFileSync('./terminal.log', '', 'utf-8');
 const client = new DiscordBot();
 
 module.exports = client;
+global.client = client;
 
 client.connect();
 

@@ -1,6 +1,7 @@
 const { Client, Collection, Partials } = require("discord.js");
 const CommandsHandler = require("./handler/CommandsHandler");
 const { warn, error, info, success } = require("../utils/Console");
+const { onMessageUpdate } = require("../utils/Vote");
 const config = require("../config");
 const CommandsListener = require("./handler/CommandsListener");
 const ComponentsHandler = require("./handler/ComponentsHandler");
@@ -59,10 +60,15 @@ class DiscordBot extends Client {
 
     startStatusRotation = () => {
         let index = 0;
+        
+        //first rotation
+        this.user.setPresence({ activities: [this.statusMessages[index]] });
+        index = (index + 1) % this.statusMessages.length;
+
         setInterval(() => {
             this.user.setPresence({ activities: [this.statusMessages[index]] });
             index = (index + 1) % this.statusMessages.length;
-        }, 4000);
+        }, 20000);
     }
 
     connect = async () => {
@@ -76,6 +82,7 @@ class DiscordBot extends Client {
             this.components_handler.load();
             this.events_handler.load();
             this.startStatusRotation();
+            this.on('messageUpdate', onMessageUpdate);
 
             warn('Attempting to register application commands... (this might take a while!)');
             await this.commands_handler.registerApplicationCommands(config.development);

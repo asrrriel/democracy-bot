@@ -15,6 +15,7 @@
     "discord.js": "^14.16.3",
     "discordjs-v14-bot-template": "file:",
     "dotenv": "^16.4.7",
+    "nodesite-deploy": "^0.1.0-1",
     "quick-yaml.db": "^1.2.2"
   }
 }
