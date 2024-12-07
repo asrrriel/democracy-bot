@@ -38,7 +38,21 @@ module.exports = new Component({
                 break;
             case 'demo':
                 msg = {
-                    content: 'placeholder demo',
+                    content: 'What role do you want to remove?',
+                    components: [
+                        new discord.ActionRowBuilder()
+                             .addComponents(new discord.StringSelectMenuBuilder()
+                                 .setCustomId('vote-demo-role')
+                                 .setPlaceholder('Select an option')
+                            )
+                    ],
+                    ephemeral: true
+                }
+                for(let i = 0; i < config.roles.length; i++) {
+                    msg.components[0].components[0].addOptions(new discord.StringSelectMenuOptionBuilder()
+                        .setLabel(interaction.guild.roles.cache.get(config.roles[i]).name)
+                        .setValue(config.roles[i])
+                    )
                 }
                 interaction.reply(msg);
                 break;

@@ -1,6 +1,7 @@
 const config = require("../config");
 
 let ongoingVotes = [];
+let partialVotes = [];
 
 module.exports = {
     /**
@@ -37,6 +38,57 @@ module.exports = {
                 }
             }
         }
+    },
+
+    async create_partial_vote(client,userId,act) {
+        partialVotes.push({
+            user_id: userId,
+            title: null,
+            name: null,
+            act: act,
+            act_args: []
+        });
+    },
+
+    async set_partial_vote_act_arg(client,userId,arg_id, arg) {
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                partialVotes[i].act_args[arg_id] = arg;
+                break;
+            }
+        }
+    },
+    async set_partial_vote_title(client,userId, title) {
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                partialVotes[i].title = title;
+                break;
+            }
+        }
+    },
+
+    async set_partial_vote_name(client,userId, name) {
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                partialVotes[i].name = name;
+                break;
+            }
+        }
+    },
+
+    async submit_partial_vote(client,userId) {
+        const thread = null;
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                thread = await this.create_vote(
+                    client,partialVotes[i].title, partialVotes[i].name,
+                    partialVotes[i].act, partialVotes[i].act_args
+                );
+                partialVotes.splice(i, 1);
+                break;
+            }
+        }
+        return thread;
     },
 
     async create_vote(client,title, name,act, act_args) {

@@ -20,7 +20,7 @@ module.exports = new Component({
             });
             return;
         }
-
+        //todo: add a reason form
         const thread = await Vote.create_vote(
             client,"Promote " + interaction.member.displayName + " to " + interaction.guild.roles.cache.get(id).name,
             "Promote <@" + interaction.user.id + "> to " + interaction.guild.roles.cache.get(id).name,
