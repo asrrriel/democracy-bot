@@ -16,19 +16,26 @@ module.exports = {
                     const act = ongoingVotes[i].act;
                     const act_args = ongoingVotes[i].act_args;
                     if(!newMessage.poll.resultsFinalized) return;
-                    if(newMessage.poll.answers.get(1).voteCount > newMessage.poll.answers.get(2).voteCount) {
+                    const ratio = newMessage.poll.answers.get(1).voteCount / newMessage.poll.answers.get(2).voteCount;
+                    if(ratio > 2/3) {
+                        const initiator = global.client.users.cache.get(act_args.user_id);
+                        const guild = global.client.guilds.cache.get(config.guildId);
+                        const i_member = guild.members.cache.get(initiator.id);
                         switch (act) {
                             case 'promo':
-                                const user = global.client.users.cache.get(act_args.user_id);
-                                user.send("You have been promoted to **" + newMessage.guild.roles.cache.get(act_args.role_id).name + "**!");
-                                const guild = global.client.guilds.cache.get(config.guildId);
-                                const member = guild.members.cache.get(user.id);
-                                member.roles.add(act_args.role_id);
+                                i_member.roles.add(act_args.role_id);
                                 break;
-                        }
+                            case 'demo':
+                                const recipient = global.client.users.cache.get(act_args.recipient_id);
+                                const r_member = guild.members.cache.get(recipient.id);
+                                r_member.roles.remove(act_args.role_id);
+                                recipient.send("You have been demoted by majority vote in <#" + newMessage.channel.id + ">");
+                                break;
+                            }
+                        initiator.send("Your proposal in <#" + newMessage.channel.id + "> has been approved at " + ratio*100 + "%.");
                     } else {
                         const user = global.client.users.cache.get(act_args.user_id);
-                        user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> has been rejected.");
+                        user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> has been rejected at " + ratio*100 + "%(treshold: 66%).");
                     }
 
                     newMessage.channel.setLocked(true);
@@ -58,6 +65,14 @@ module.exports = {
             }
         }
     },
+
+    async get_partial_vote_act_arg(client,userId,arg_id) {
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                return partialVotes[i].act_args[arg_id];
+            }
+        }
+    }, 
     async set_partial_vote_title(client,userId, title) {
         for (let i = 0; i < partialVotes.length; i++) {
             if (partialVotes[i].user_id == userId) {
@@ -77,7 +92,7 @@ module.exports = {
     },
 
     async submit_partial_vote(client,userId) {
-        const thread = null;
+        var thread = null;
         for (let i = 0; i < partialVotes.length; i++) {
             if (partialVotes[i].user_id == userId) {
                 thread = await this.create_vote(

@@ -17,25 +17,21 @@ module.exports = new Component({
 
         Vote.set_partial_vote_act_arg(client,interaction.user.id,"recipient_id",id);
 
-
-        //TODO: make the reason form
-        interaction.reply({
-            content: "**Why** do you want to demote them?",
-            components: [
+        let modal = new discord.ModalBuilder()
+            .setCustomId('vote-demo-reason')
+            .setTitle('Vote Demote Reason')
+            .addComponents(
                 new discord.ActionRowBuilder()
-                     .addComponents(new discord.StringSelectMenuBuilder()
-                         .setCustomId('vote-demo-reason')
-                         .setPlaceholder('Select an option')
-                         .addOptions(
-                             users.map((user) => {
-                                 return new discord.StringSelectMenuOptionBuilder()
-                                     .setLabel(user.globalName)
-                                     .setValue(user.id);
-                             })
-                         )
+                    .addComponents(
+                        new discord.TextInputBuilder()
+                            .setCustomId('vote-demo-reason')
+                            .setLabel('Reason')
+                            .setStyle(discord.TextInputStyle.Paragraph)
+                            .setMinLength(1)
+                            .setMaxLength(1000)
                     )
-            ],
-            ephemeral: true
-        });
+            );
+
+        interaction.showModal(modal);
     }
 }).toJSON();
