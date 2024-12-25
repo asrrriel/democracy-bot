@@ -1,7 +1,6 @@
 const { Message } = require("discord.js");
-const MessageCommand = require("../../structure/MessageCommand");
-const ApplicationCommand = require("../../structure/ApplicationCommand");
-const config = require("../../config");
+const ApplicationCommand = require("../structure/ApplicationCommand");
+const config = require("../config");
 
 const application_commands_cooldown = new Map();
 const message_commands_cooldown = new Map();
@@ -14,32 +13,11 @@ const message_commands_cooldown = new Map();
  * @returns {boolean}
  */
 const handleApplicationCommandOptions = async (interaction, options, command) => {
-    if (options.botOwner) {
-        if (interaction.user.id !== config.users.ownerId) {
-            await interaction.reply({
-                content: config.messages.NOT_BOT_OWNER,
-                ephemeral: true
-            });
-
-            return false;
-        }
-    }
 
     if (options.botDevelopers) {
         if (config.users?.developers?.length > 0 && !config.users?.developers?.includes(interaction.user.id)) {
             await interaction.reply({
                 content: config.messages.NOT_BOT_DEVELOPER,
-                ephemeral: true
-            });
-
-            return false;
-        }
-    }
-
-    if (options.guildOwner) {
-        if (interaction.user.id !== interaction.guild.ownerId) {
-            await interaction.reply({
-                content: config.messages.NOT_GUILD_OWNER,
                 ephemeral: true
             });
 

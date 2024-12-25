@@ -1,4 +1,3 @@
-const DiscordBot = require("../../client/DiscordBot");
 const Component = require("../../structure/Component");
 const Vote = require('../../utils/Vote');
 
@@ -9,7 +8,7 @@ module.exports = new Component({
     type: 'select',
     /**
      * 
-     * @param {DiscordBot} client 
+     * @param {typeof(global.client)} client 
      * @param {import("discord.js").AnySelectMenuInteraction} interaction 
      */
     run: async (client, interaction) => {

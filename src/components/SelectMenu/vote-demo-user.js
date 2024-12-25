@@ -1,4 +1,4 @@
-const DiscordBot = require("../../client/DiscordBot");
+
 const Component = require("../../structure/Component");
 const Vote = require('../../utils/Vote');
 
@@ -9,7 +9,7 @@ module.exports = new Component({
     type: 'select',
     /**
      * 
-     * @param {DiscordBot} client 
+     * @param {typeof(global.client)} client 
      * @param {import("discord.js").AnySelectMenuInteraction} interaction 
      */
     run: async (client, interaction) => {
@@ -18,13 +18,13 @@ module.exports = new Component({
         Vote.set_partial_vote_act_arg(client,interaction.user.id,"recipient_id",id);
 
         let modal = new discord.ModalBuilder()
-            .setCustomId('vote-demo-reason')
-            .setTitle('Vote Demote Reason')
+            .setCustomId('vote-reason')
+            .setTitle('Why do you want to demote ' + interaction.guild.members.cache.get(id).displayName + '?')
             .addComponents(
                 new discord.ActionRowBuilder()
                     .addComponents(
                         new discord.TextInputBuilder()
-                            .setCustomId('vote-demo-reason')
+                            .setCustomId('vote-reason')
                             .setLabel('Reason')
                             .setStyle(discord.TextInputStyle.Paragraph)
                             .setMinLength(1)

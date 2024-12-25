@@ -1,14 +1,15 @@
-const { ChatInputCommandInteraction } = require("discord.js");
+const { ChatInputCommandInteraction, AttachmentBuilder } = require("discord.js");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const config = require("../../config");
 
 module.exports = new ApplicationCommand({
     command: {
-        name: 'help',
-        description: 'Replies with a list of available application commands.',
+        name: 'shutdown',
+        description: 'Kill the bot.',
         options: []
     },
     options: {
-        cooldown: 10000
+        botDevelopers: true
     },
     /**
      * 
@@ -16,8 +17,6 @@ module.exports = new ApplicationCommand({
      * @param {ChatInputCommandInteraction} interaction 
      */
     run: async (client, interaction) => {
-        await interaction.reply({
-            content: `${client.collection.application_commands.map((cmd) => '\`/' + cmd.command.name + '\`').join(', ')}`
-        });
+        process.abort();
     }
 }).toJSON();

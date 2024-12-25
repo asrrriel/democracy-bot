@@ -1,11 +1,9 @@
-const DiscordBot = require('../client/DiscordBot');
-
 class AutocompleteComponent {
     data;
 
     /**
      *
-     * @param {{commandName: string, run: import("discord.js").Awaitable<(client: DiscordBot, interaction: import('discord.js').AutocompleteInteraction) => void> }} structure 
+     * @param {{commandName: string, run: import("discord.js").Awaitable<(client: typeof(global.client), interaction: import('discord.js').AutocompleteInteraction) => void> }} structure 
      */
     constructor(structure) {
         this.data = {

@@ -1,12 +1,10 @@
 const { ChatInputCommandInteraction, ApplicationCommandOptionType, AttachmentBuilder } = require("discord.js");
-const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
 module.exports = new ApplicationCommand({
     command: {
         name: 'eval',
         description: 'Execute a JavaScript code.',
-        type: 1,
         options: [{
             name: 'code',
             description: 'The code to execute.',
@@ -15,11 +13,11 @@ module.exports = new ApplicationCommand({
         }]
     },
     options: {
-        botOwner: true
+        botDevelopers: true
     },
     /**
      * 
-     * @param {DiscordBot} client 
+     * @param {typeof(global.client)} client 
      * @param {ChatInputCommandInteraction} interaction 
      */
     run: async (client, interaction) => {

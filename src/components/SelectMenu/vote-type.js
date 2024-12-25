@@ -1,5 +1,5 @@
 const discord = require("discord.js");
-const DiscordBot = require("../../client/DiscordBot");
+
 const Component = require("../../structure/Component");
 const config = require("../../config");
 
@@ -8,7 +8,7 @@ module.exports = new Component({
     type: 'select',
     /**
      * 
-     * @param {DiscordBot} client 
+     * @param {typeof(global.client)} client 
      * @param {import("discord.js").AnySelectMenuInteraction} interaction 
      */
     run: async (client, interaction) => {
@@ -28,10 +28,10 @@ module.exports = new Component({
                     ],
                     ephemeral: true
                 }
-                for(let i = 0; i < config.roles.length; i++) {
+                for(let i = 0; i < config.modules.role_manager.roles.length; i++) {
                     msg.components[0].components[0].addOptions(new discord.StringSelectMenuOptionBuilder()
-                        .setLabel(interaction.guild.roles.cache.get(config.roles[i]).name)
-                        .setValue(config.roles[i])
+                        .setLabel(interaction.guild.roles.cache.get(config.modules.role_manager.roles[i].id).name)
+                        .setValue(config.modules.role_manager.roles[i].id)
                     )
                 }
                 interaction.reply(msg);
@@ -48,10 +48,11 @@ module.exports = new Component({
                     ],
                     ephemeral: true
                 }
-                for(let i = 0; i < config.roles.length; i++) {
+                for(let i = 0; i < config.modules.role_manager.roles.length; i++) {
+                    console.log(config.modules.role_manager.roles[i].id);
                     msg.components[0].components[0].addOptions(new discord.StringSelectMenuOptionBuilder()
-                        .setLabel(interaction.guild.roles.cache.get(config.roles[i]).name)
-                        .setValue(config.roles[i])
+                        .setLabel(interaction.guild.roles.cache.get(config.modules.role_manager.roles[i].id).name)
+                        .setValue(config.modules.role_manager.roles[i].id)
                     )
                 }
                 interaction.reply(msg);

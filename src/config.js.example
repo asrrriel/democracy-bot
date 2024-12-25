@@ -1,0 +1,96 @@
+const config = {
+    token: "<placeholder>",  // bot token for logging in
+    guildId: '<placeholder>',                                                     // the guild(server) ID for the server the bot is used in
+    developers: ['<placeholder>','<placeholder>',"<placeholder>"],                           // developer IDs(BE CAREFUL, /EVAL, /END AND /SHUTDOWN CAN RUIN DEMOCRACY)
+    statusMessages: [
+        { name: '/help is for democracy commands!', type: 4 },
+        { name: 'Server owner? Never heard of such thing!', type: 4 },
+        { name: 'You.. not', type: 3 },
+        { name: 'OSDEV is not for pussies', type: 4 },
+    ],
+    modules: {
+        reputations: {
+            enable: true,                                                               // Enable the reputation(REP) system?
+            starting_reputation: 10,                                                    // Starting REP for newcomers
+            rep_public: true,                                                           // Allow ANYONE to see EVERYONE's REAP and stats?
+            reputation_grants: {
+                success: 10,                                                            // when your vote wins(applies to everyone who voted yes)
+                fail: -10,                                                              // when your vote loses(applies to everyone who voted yes)
+                upvote: 1,                                                              // mod action upvote,these multiply with efficiency
+                downvote: -1,                                                           // mod action downvote,these multiply with efficiency
+                mod_voting: 5,                                                          // when you vote on a mod action
+                mod_failed: -5,                                                         // when your voted mod action gets appeled and reverted(applies to everyone who voted yes)
+            }
+        },
+        voting: {
+            channel: '<placeholder>',                                             // Channel for voting general stuff
+            cooldown: 600,                                                              // Cooldown for initiating a vote(in seconds)
+        },
+        role_manager :{
+            enable: true,
+            roles: [
+                {id:"<placeholder>",reputation_gate: 50}                           // Moderator
+            ]
+        },
+        moderation: {
+            enabled: true,                                                              // Enable the moderation systen?
+            mod_role: "132141817<placeholder>4167650377",                                             // The role that can do mod actions
+            mod_action_channel: "<placeholder>",                                               // The channel for mod actions to be judged
+            mod_votes_channel: "<placeholder>",                                                // The channel for voting on mod actions
+            upvote_emoji: "👍",                                                         // Emoji for upvote reaction
+            downvote_emoji: "👎",                                                       // Emoji for downvote reaction
+            udvote_antispam: true,                                                      // Wear off people's voting power over time?
+            udvote_antispam_buffer: 20,                                                 // How much spammy actions you can do before your voting power starts wearing off
+            udvote_antispam_duration: 100,                                              // How many messages it takes for your voting power to wear off to 0
+            udvote_antispam_reset_frequency: 600,                                       // How much time makes your buffer reset(in seconds)
+            udvote_antispam_global_reset_frequency: 365,                                // How much time makes all people's voting power(in days)
+
+
+            allow_voted_action: true,                                                   // Allow voted actions(action initiated and voted on by moderators)?
+            voted_action_rep_gate: 50,                                                  // How much REP you need to initiate a voted action
+            voted_action_rep_peanelty: 10,                                              // How much REP you lose if you initiate a voted action but it gets appealed
+            voted_action_cooldown: 600,                                                 // Wait time between initiating voted actions(in seconds)
+
+            allow_quick_action: true,                                                   // Allow quick actions?
+            quick_action_rep_gate: 500,                                                 // How much REP you need to use a quick action
+            quick_action_rep_peanelty: 100,                                             // How much REP you lose if you use a quick action but it gets appealed
+            quick_action_cooldown: 600,                                                 // Wait time between quick actions(in seconds)
+
+            rules: {
+                enable: true,                                                           // Enable rules management?
+                rules_channel: "<placeholder>",                                                // The channel for rules
+                blocked_words : {
+                    enable: true,                                                       // Enable blocked words?
+                    block_msg: true                                                     // Block messages containing blocked words(false will only substitute the word)?
+                }
+            },
+            actions: {
+                report_mute: true,                                                      // Enable report mute(mote for reported violations)?
+                report_kick: true,                                                      // Enable report kick(kick for reported violations)?
+                report_ban: true,                                                       // Enable report ban(ban for reported violations)?
+                voted_mute: true,                                                       // Enable voted mute(mute vote initiated by a moderator)?
+                voted_kick: true,                                                       // Enable voted kick(kick vote initiated by a moderator)?
+                voted_ban: true,                                                        // Enable voted ban(ban vote initiated by a moderator)?
+                quick_mute: true,                                                       // Enable quick mute(mute via quick actions)?
+                quick_kick: true,                                                       // Enable quick kick(kick via quick actions)?
+                quick_ban: true,                                                        // Enable quick ban(ban via quick actions)?
+            },
+            reports: {
+                enable: true,                                                           // Enable reports?
+                report_channel: "<placeholder>"                                                // The channel for reports
+            },
+            appeals: {
+                enable: true,                                                           // Enable appeals?
+                appeal_channel: "<placeholder>"                                                // The channel for appeals
+            }
+        }
+
+    },
+    strings: {
+        NOT_DEVELOPER: 'You do not have the permission to run this command because you\'re not a developer of me!',
+        GUILD_COOLDOWN: 'You are currently in cooldown, you have the ability to re-use this command again in \`%cooldown%s\`.'
+    },
+
+}
+
+module.exports = config;

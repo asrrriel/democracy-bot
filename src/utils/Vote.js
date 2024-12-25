@@ -17,10 +17,10 @@ module.exports = {
                     const act_args = ongoingVotes[i].act_args;
                     if(!newMessage.poll.resultsFinalized) return;
                     const ratio = newMessage.poll.answers.get(1).voteCount / newMessage.poll.answers.get(2).voteCount;
-                    if(ratio > 2/3) {
-                        const initiator = global.client.users.cache.get(act_args.user_id);
-                        const guild = global.client.guilds.cache.get(config.guildId);
-                        const i_member = guild.members.cache.get(initiator.id);
+                    if(ratio >= 2/3) {
+                        const initiator = await global.client.users.cache.get(act_args.user_id);
+                        const guild = await global.client.guilds.cache.get(config.guildId);
+                        const i_member = await guild.members.cache.get(initiator.id);
                         switch (act) {
                             case 'promo':
                                 i_member.roles.add(act_args.role_id);
@@ -32,10 +32,14 @@ module.exports = {
                                 recipient.send("You have been demoted by majority vote in <#" + newMessage.channel.id + ">");
                                 break;
                             }
-                        initiator.send("Your proposal in <#" + newMessage.channel.id + "> has been approved at " + ratio*100 + "%.");
+                        initiator.send("Your proposal in <#" + newMessage.channel.id + "> has been approved at " +  Math.min(1,ratio)*100 + "%.");
                     } else {
                         const user = global.client.users.cache.get(act_args.user_id);
-                        user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> has been rejected at " + ratio*100 + "%(treshold: 66%).");
+                        if(isNaN(ratio)) {
+                            user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> recieved no votes.");
+                        } else {
+                            user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> has been rejected at " + Math.min(1,ratio)*100 + "%(treshold: 66%).");
+                        }
                     }
 
                     newMessage.channel.setLocked(true);
@@ -48,6 +52,11 @@ module.exports = {
     },
 
     async create_partial_vote(client,userId,act) {
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                partialVotes.slice(i, 1);
+            }
+        }
         partialVotes.push({
             user_id: userId,
             title: null,
@@ -55,6 +64,14 @@ module.exports = {
             act: act,
             act_args: []
         });
+    },
+
+    async get_partial_vote_act(client,userId) {
+        for (let i = 0; i < partialVotes.length; i++) {
+            if (partialVotes[i].user_id == userId) {
+                return partialVotes[i].act;
+            }
+        }
     },
 
     async set_partial_vote_act_arg(client,userId,arg_id, arg) {
@@ -107,7 +124,7 @@ module.exports = {
     },
 
     async create_vote(client,title, name,act, act_args) {
-        const forum = await client.channels.fetch(config.channels.votes);
+        const forum = await client.channels.fetch(config.modules.voting.channel);
 
         const thread = await forum.threads.create({
             name: title,
@@ -120,9 +137,9 @@ module.exports = {
         });
 
         const poll = await thread.send({
-            content: `Vote here!`,
+            content: ``,
             poll: {
-                question: { text: 'placeholder' },
+                question: { text: title + '?' },
                 answers: [
                   { text: 'Yes', emoji: '' },
                   { text: 'No', emoji: '' },

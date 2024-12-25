@@ -1,21 +1,10 @@
-const { info, error, success } = require('../../utils/Console');
+const { info, error, success } = require('../utils/Console');
 const { readdirSync } = require('fs');
-const DiscordBot = require('../DiscordBot');
-const Component = require('../../structure/Component');
-const AutocompleteComponent = require('../../structure/AutocompleteComponent');
-const Event = require('../../structure/Event');
+const Component = require('../structure/Component');
+const AutocompleteComponent = require('../structure/AutocompleteComponent');
+const Event = require('../structure/Event');
 
 class EventsHandler {
-    client;
-
-    /**
-     *
-     * @param {DiscordBot} client 
-     */
-    constructor(client) {
-        this.client = client;
-    }
-
     load = () => {
         let total = 0;
 
@@ -25,7 +14,7 @@ class EventsHandler {
                     /**
                      * @type {Event['data']}
                      */
-                    const module = require('../../events/' + directory + '/' + file);
+                    const module = require('../events/' + directory + '/' + file);
 
                     if (!module) continue;
 
@@ -36,9 +25,9 @@ class EventsHandler {
                         }
 
                         if (module.once) {
-                            this.client.once(module.event, (...args) => module.run(this.client, ...args));
+                            global.client.once(module.event, (...args) => module.run(global.client, ...args));
                         } else {
-                            this.client.on(module.event, (...args) => module.run(this.client, ...args));
+                            global.client.on(module.event, (...args) => module.run(global.client, ...args));
                         }
 
                         info(`Loaded new event: ` + file);
