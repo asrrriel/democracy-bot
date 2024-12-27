@@ -1,10 +1,10 @@
 {
   "name": "democracy-bot",
   "version": "1.0.0",
-  "description": "A Discord bot commands, components and events handler based on discord.js v14 and fully written in JavaScript.",
+  "description": "A Discord democracy bot",
   "main": "src/index.js",
   "keywords": [],
-  "author": "TFAGaming",
+  "author": "Asrrriel",
   "license": "GPL-3.0",
   "dependencies": {
     "colors": "^1.4.0",

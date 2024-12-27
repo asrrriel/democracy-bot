@@ -1,7 +1,6 @@
 const { ChatInputCommandInteraction } = require("discord.js");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const SqliteShit = require("../../handler/SqliteShit");
-
 const config = require("../../config");
 
 module.exports = new ApplicationCommand({
@@ -21,13 +20,8 @@ module.exports = new ApplicationCommand({
         cooldown: 1000,
         botDevelopers: !config.modules.reputations.rep_public
     },
-    /**
-     * 
-     * @param {typeof(global.client)} client 
-     * @param {ChatInputCommandInteraction} interaction 
-     */
     run: async (client, interaction) => {
-        if(!config.modules.reputations.enable){
+        if (!config.modules.reputations.enable) {
             interaction.reply({
                 content: 'Reputation system is disabled',
                 ephemeral: true
@@ -37,16 +31,29 @@ module.exports = new ApplicationCommand({
 
         let user_id = interaction.options.getUser('user') ? interaction.options.getUser('user').id : interaction.user.id;
 
-        let reply = await SqliteShit.work( {cmd: 'get_rep', user_id: user_id});
+        let reply = await SqliteShit.work({ cmd: 'get_rep', user_id: user_id });
         console.log(reply);
 
-        if(interaction.options.getUser('user')) {
+        if (interaction.options.getUser('user')) {
+            cmsg = "";
+            if (reply.rep_count == undefined) {
+                cmsg = "Couldnt fetch `" + interaction.guild.members.cache.get(user_id).displayName + "`'s rep count";
+            } else {
+                cmsg = interaction.guild.members.cache.get(user_id).displayName + " has " + reply.rep_count + " REP points";
+            }
+
             interaction.reply({
-                content: interaction.guild.members.cache.get(user_id).displayName + " has " + reply.rep_count + " REP points"
+                content: cmsg
             });
         } else {
+            cmsg = "";
+            if (reply.rep_count == undefined) {
+                cmsg = "Couldnt fetch your rep count";
+            } else {
+                cmsg = "You have " + reply.rep_count + " REP points";
+            }
             interaction.reply({
-                content: "You have " + reply.rep_count + " REP points"
+                content: cmsg
             });
         }
     }

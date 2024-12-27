@@ -31,6 +31,8 @@ module.exports = {
 
         prepared_statements['add_user']  = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?)');
         prepared_statements['get_rep']   = await db.prepare('SELECT rep FROM users WHERE id = ?');
+        prepared_statements['set_rep'] = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET rep = excluded.rep');
+        
 
         prepared_statements['add_pvote'] = await db.prepare('UPDATE users SET pvote_act = ? WHERE id = ?');
         prepared_statements['get_pvote'] = await db.prepare('SELECT * FROM users WHERE id = ?');
@@ -67,6 +69,14 @@ module.exports = {
                     return {rep_count: rep.rep}
                 } catch (error) {
                     return {err: error, msg: "Failed to get reputation of user with ID " + id}
+                }
+
+            case 'set_rep':
+                try {
+                    prepared_statements['set_rep'].run(id, command.amount);
+                    return {msg: "Successfully set reputation of user with ID " + id + " to " + command.amount}
+                } catch (error) {
+                    return {err: error, msg: "Failed to set reputation of user with ID " + id + " to " + amount}
                 }
             case 'add_pvote':
                 prepared_statements['add_pvote'].run(act, id);
