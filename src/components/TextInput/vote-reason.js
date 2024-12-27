@@ -1,4 +1,5 @@
 
+const SqliteShit = require("../../handler/SqliteShit");
 const Component = require("../../structure/Component");
 const Vote = require('../../utils/Vote');
 
@@ -15,22 +16,29 @@ module.exports = new Component({
     run: async (client, interaction) => {
         const reason = interaction.fields.getTextInputValue('vote-reason')
 
-        Vote.set_partial_vote_act_arg(client,interaction.user.id,"reason",reason);
+        const pvote = await SqliteShit.work({cmd: 'get_pvote', user_id: interaction.user.id});
 
-        const recipient_id = await Vote.get_partial_vote_act_arg(client,interaction.user.id,"recipient_id");
+        let title = "";
+        let text = "";
 
-        switch(await Vote.get_partial_vote_act(client,interaction.user.id)) {
+        switch(pvote.act) {
             case "promo":
-                Vote.set_partial_vote_title(client,interaction.user.id,"Promote " + interaction.guild.members.cache.get(interaction.user.id).displayName);
-                Vote.set_partial_vote_name(client,interaction.user.id,"Promote <@" + interaction.user.id + ">\nReason: \"" + reason + "\"")
+                title = "Promote " + interaction.guild.members.cache.get(pvote.recipient_id).displayName + " to " + interaction.guild.roles.cache.get(pvote.role_id).name;
+                text = "Promote <@" + pvote.recipient_id + "> to " + interaction.guild.roles.cache.get(pvote.role_id).name + "\nReason: \"" + reason + "\"\nInitiator: <@" + interaction.user.id + ">";
                 break;
             case "demo":
-                Vote.set_partial_vote_title(client,interaction.user.id,"Demote " + interaction.guild.members.cache.get(recipient_id).displayName);
-                Vote.set_partial_vote_name(client,interaction.user.id,"Demote <@" + recipient_id + ">\nReason: \"" + reason + "\"\nInitiator: <@" + interaction.user.id + ">");
+                title = "Demote " + interaction.guild.members.cache.get(pvote.recipient_id).displayName + " from " + interaction.guild.roles.cache.get(pvote.role_id).name;
+                text = "Demote <@" + pvote.recipient_id + "> from " + interaction.guild.roles.cache.get(pvote.role_id).name + "\nReason: \"" + reason + "\"\nInitiator: <@" + interaction.user.id + ">";
                 break;
+            default:
+                interaction.reply({
+                    content: 'Something went wrong',
+                    ephemeral: true
+                });
+                return;
         }
 
-        let thread = await Vote.submit_partial_vote(client,interaction.user.id);
+        const thread = await Vote.create_vote(title,text,pvote.act,interaction.user.id,pvote.role_id,pvote.recipient_id,reason);
 
         interaction.reply({
             content: "Your proposal has been submitted over at <#" + thread.id + ">",

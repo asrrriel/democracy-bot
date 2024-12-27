@@ -2,6 +2,7 @@ const discord = require("discord.js");
 
 const Component = require("../../structure/Component");
 const config = require("../../config");
+const SqliteShit = require("../../handler/SqliteShit");
 
 module.exports = new Component({
     customId: 'vote-type',
@@ -15,14 +16,16 @@ module.exports = new Component({
 
         const type = interaction.values[0];
 
+        SqliteShit.work( {cmd: 'add_pvote', user_id: interaction.user.id,act: type});
+
         switch (type) {
             case 'promo':
                 msg = {
-                    content: 'What role do you want?',
+                    content: 'What role? Remember that you need to have enough reputation to get some roles.',
                     components: [
                         new discord.ActionRowBuilder()
                              .addComponents(new discord.StringSelectMenuBuilder()
-                                 .setCustomId('vote-promo')
+                                 .setCustomId('vote-role')
                                  .setPlaceholder('Select an option')
                             )
                     ],
@@ -30,8 +33,8 @@ module.exports = new Component({
                 }
                 for(let i = 0; i < config.modules.role_manager.roles.length; i++) {
                     msg.components[0].components[0].addOptions(new discord.StringSelectMenuOptionBuilder()
-                        .setLabel(interaction.guild.roles.cache.get(config.modules.role_manager.roles[i].id).name)
-                        .setValue(config.modules.role_manager.roles[i].id)
+                        .setLabel(interaction.guild.roles.cache.get(config.modules.role_manager.roles[i].id).name + " (you need " + config.modules.role_manager.roles[i].reputation_gate + " REP)")
+                        .setValue(i.toString())
                     )
                 }
                 interaction.reply(msg);
@@ -42,17 +45,16 @@ module.exports = new Component({
                     components: [
                         new discord.ActionRowBuilder()
                              .addComponents(new discord.StringSelectMenuBuilder()
-                                 .setCustomId('vote-demo-role')
+                                 .setCustomId('vote-role')
                                  .setPlaceholder('Select an option')
                             )
                     ],
                     ephemeral: true
                 }
                 for(let i = 0; i < config.modules.role_manager.roles.length; i++) {
-                    console.log(config.modules.role_manager.roles[i].id);
                     msg.components[0].components[0].addOptions(new discord.StringSelectMenuOptionBuilder()
                         .setLabel(interaction.guild.roles.cache.get(config.modules.role_manager.roles[i].id).name)
-                        .setValue(config.modules.role_manager.roles[i].id)
+                        .setValue(i.toString())
                     )
                 }
                 interaction.reply(msg);

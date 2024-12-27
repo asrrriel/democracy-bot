@@ -1,5 +1,11 @@
+//ffs
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 const fs = require('fs');
 fs.writeFileSync('./terminal.log', '', 'utf-8');
+const { Database } = require('sqlite-async');
+
 
 const { Client, Collection, Partials } = require("discord.js");
 const CommandsHandler = require("./handler/CommandsHandler");
@@ -10,6 +16,8 @@ const CommandsListener = require("./handler/CommandsListener");
 const ComponentsHandler = require("./handler/ComponentsHandler");
 const ComponentsListener = require("./handler/ComponentsListener");
 const EventsHandler = require("./handler/EventsHandler");
+const SqliteShit = require("./handler/SqliteShit");
+const Vote = require("./utils/Vote");
 
 class DemocracyBot extends Client {
     collection = {
@@ -28,6 +36,8 @@ class DemocracyBot extends Client {
     commands_handler = null
     components_handler = null;
     events_handler = null;
+
+    db = null;
 
     constructor() {
         super({
@@ -55,6 +65,15 @@ class DemocracyBot extends Client {
         new ComponentsListener();
     }
 
+    /**
+     * 
+     * @param {import("discord.js").Message} oldMessage 
+     * @param {import("discord.js").Message} newMessage 
+     */
+    onMessageUpdate = async function(oldMessage, newMessage){
+        await Vote.handleVote(newMessage.id);
+    }
+
     startStatusRotation = () => {
         let index = 0;
 
@@ -79,7 +98,7 @@ class DemocracyBot extends Client {
             this.components_handler.load();
             this.events_handler.load();
             this.startStatusRotation();
-            this.on('messageUpdate', onMessageUpdate);
+            this.on('messageUpdate', this.onMessageUpdate);
 
             warn('Attempting to register application commands... (this might take a while!)');
             await this.commands_handler.registerApplicationCommands();
@@ -90,12 +109,23 @@ class DemocracyBot extends Client {
             this.login_attempts++;
             setTimeout(this.connect, 5000);
         }
+
+        //refresh users on startup
+        for(const member of this.guilds.cache.get(config.guildId).members.cache.values()) {
+            if(!member.user.bot) {
+                info(`Refreshing user with ID ${member.id}`);
+                await SqliteShit.work({cmd: 'add_user_if_not_exists', user_id: member.id});
+            }
+        }
     }
 }
-
 const client = new DemocracyBot();
+const database = await Database.open('./database.db');
+
+client.db = database;
+SqliteShit.setupDB(database);
+
+process.on('uncaughtException', console.error);
+process.on('unhandledRejection', console.error);
 
 client.connect();
-
-process.on('unhandledRejection', console.error);
-process.on('uncaughtException', console.error);

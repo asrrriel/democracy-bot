@@ -1,136 +1,55 @@
 const config = require("../config");
-
-let ongoingVotes = [];
-let partialVotes = [];
+const SqliteShit = require("../handler/SqliteShit");
 
 module.exports = {
-    /**
-     * 
-     * @param {import("discord.js").Message} oldMessage 
-     * @param {import("discord.js").Message} newMessage 
-     */
-    async onMessageUpdate(oldMessage, newMessage){
-        if (ongoingVotes.length > 0) {
-            for (let i = 0; i < ongoingVotes.length; i++) {
-                if (ongoingVotes[i].msg_id == oldMessage.id) {
-                    const act = ongoingVotes[i].act;
-                    const act_args = ongoingVotes[i].act_args;
-                    if(!newMessage.poll.resultsFinalized) return;
-                    const ratio = newMessage.poll.answers.get(1).voteCount / newMessage.poll.answers.get(2).voteCount;
-                    if(ratio >= 2/3) {
-                        const initiator = await global.client.users.cache.get(act_args.user_id);
-                        const guild = await global.client.guilds.cache.get(config.guildId);
-                        const i_member = await guild.members.cache.get(initiator.id);
-                        switch (act) {
-                            case 'promo':
-                                i_member.roles.add(act_args.role_id);
-                                break;
-                            case 'demo':
-                                const recipient = global.client.users.cache.get(act_args.recipient_id);
-                                const r_member = guild.members.cache.get(recipient.id);
-                                r_member.roles.remove(act_args.role_id);
-                                recipient.send("You have been demoted by majority vote in <#" + newMessage.channel.id + ">");
-                                break;
-                            }
-                        initiator.send("Your proposal in <#" + newMessage.channel.id + "> has been approved at " +  Math.min(1,ratio)*100 + "%.");
-                    } else {
-                        const user = global.client.users.cache.get(act_args.user_id);
-                        if(isNaN(ratio)) {
-                            user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> recieved no votes.");
-                        } else {
-                            user.send("Sorry, but your proposal in <#" + newMessage.channel.id + "> has been rejected at " + Math.min(1,ratio)*100 + "%(treshold: 66%).");
-                        }
-                    }
+    async handleVote(messageId) {
+        const guild = await global.client.guilds.cache.get(config.guildId);
+        const vote = await SqliteShit.work(global.client.db, {cmd: 'get_vote', msg_id: messageId});
 
-                    newMessage.channel.setLocked(true);
-                    newMessage.channel.setLocked(true);
-                    ongoingVotes.splice(i, 1);
+        const vote_channel = await global.client.channels.cache.get(config.modules.voting.channel);
+        const vote_thread  = await vote_channel.threads.cache.get(vote.thread_id);
+        const message      = await vote_thread.messages.fetch(vote.msg_id);
+
+        if(vote.err !== undefined || message.poll === undefined || !message.poll.resultsFinalized) return;
+
+        const act = vote.act;
+        const initiator = await global.client.users.cache.get(vote.maker_id);
+        const i_member = await guild.members.cache.get(initiator.id);
+        const recipient = global.client.users.cache.get(vote.recipient_id);
+        const r_member = guild.members.cache.get(vote.recipient_id);
+
+        const ratio = message.poll.answers.get(1).voteCount / message.poll.answers.get(2).voteCount;
+        if(ratio >= 2/3) {
+            switch (act) {
+                case 'promo':
+                    i_member.roles.add(vote.role_id);
+                    break;
+                case 'demo':
+                    r_member.roles.remove(vote.role_id);
+                    recipient.send("You have been demoted by majority vote in <#" + message.channel.id + ">");
                     break;
                 }
+            initiator.send("Your proposal in <#" + message.channel.id + "> has been approved at " +  Math.min(1,ratio)*100 + "%.");
+        } else {
+            if(isNaN(ratio)) {
+                initiator.send("Sorry, but your proposal in <#" + message.channel.id + "> recieved no votes.");
+            } else {
+                initiator.send("Sorry, but your proposal in <#" + message.channel.id + "> has been rejected at " + Math.min(1,ratio)*100 + "%(treshold: 66%).");
             }
         }
+
+        message.channel.setLocked(true);
+        SqliteShit.work(global.client.db, {cmd: 'remove_vote', msg_id: messageId});
     },
 
-    async create_partial_vote(client,userId,act) {
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                partialVotes.slice(i, 1);
-            }
-        }
-        partialVotes.push({
-            user_id: userId,
-            title: null,
-            name: null,
-            act: act,
-            act_args: []
-        });
-    },
-
-    async get_partial_vote_act(client,userId) {
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                return partialVotes[i].act;
-            }
-        }
-    },
-
-    async set_partial_vote_act_arg(client,userId,arg_id, arg) {
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                partialVotes[i].act_args[arg_id] = arg;
-                break;
-            }
-        }
-    },
-
-    async get_partial_vote_act_arg(client,userId,arg_id) {
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                return partialVotes[i].act_args[arg_id];
-            }
-        }
-    }, 
-    async set_partial_vote_title(client,userId, title) {
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                partialVotes[i].title = title;
-                break;
-            }
-        }
-    },
-
-    async set_partial_vote_name(client,userId, name) {
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                partialVotes[i].name = name;
-                break;
-            }
-        }
-    },
-
-    async submit_partial_vote(client,userId) {
-        var thread = null;
-        for (let i = 0; i < partialVotes.length; i++) {
-            if (partialVotes[i].user_id == userId) {
-                thread = await this.create_vote(
-                    client,partialVotes[i].title, partialVotes[i].name,
-                    partialVotes[i].act, partialVotes[i].act_args
-                );
-                partialVotes.splice(i, 1);
-                break;
-            }
-        }
-        return thread;
-    },
-
-    async create_vote(client,title, name,act, act_args) {
-        const forum = await client.channels.fetch(config.modules.voting.channel);
+    async create_vote(title, text,act,user_id, role_id,recipient_id,reason) {
+        const forum = await global.client.channels.fetch(config.modules.voting.channel);
 
         const thread = await forum.threads.create({
             name: title,
             autoArchiveDuration: 60, // its in minutes
             message: {
-                content: name,
+                content: text,
                 flags: [ 4096 ] // silent
             },
             reason: 'Vote creation',
@@ -150,10 +69,14 @@ module.exports = {
             },
         });
 
-        ongoingVotes.push({
+        SqliteShit.work({
+            cmd: 'add_vote',
+            user_id: user_id,
             msg_id: poll.id,
+            thread_id: thread.id,
             act: act,
-            act_args: act_args
+            role_id: role_id,
+            recipient_id: recipient_id,
         });
 
         return thread;

@@ -51,7 +51,7 @@ const handleApplicationCommandOptions = async (interaction, options, command) =>
 
             if (data.some((cmd) => cmd === interaction.commandName)) {
                 await interaction.reply({
-                    content: config.messages.GUILD_COOLDOWN.replace(/%cooldown%/g, options.cooldown / 1000),
+                    content: config.strings.GUILD_COOLDOWN.replace(/%cooldown%/g, options.cooldown / 1000),
                     ephemeral: true
                 });
 

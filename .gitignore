@@ -4,5 +4,5 @@ package-lock.json
 # DO NOT REMOVE THESE FOR SECURITY
 .env
 src/config.js
-database.yml
+database.db
 terminal.log
