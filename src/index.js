@@ -18,6 +18,8 @@ const ComponentsListener = require("./handler/ComponentsListener");
 const EventsHandler = require("./handler/EventsHandler");
 const SqliteShit = require("./handler/SqliteShit");
 const Vote = require("./utils/Vote");
+const Rules = require("./utils/Rules");
+
 
 class DemocracyBot extends Client {
     collection = {
@@ -63,6 +65,7 @@ class DemocracyBot extends Client {
         this.events_handler = new EventsHandler();
         new CommandsListener();
         new ComponentsListener();
+
     }
 
     /**

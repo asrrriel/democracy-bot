@@ -29,10 +29,24 @@ module.exports = {
             )
         `);
 
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS rules (
+                title TEXT PRIMARY KEY,
+                description TEXT,
+
+                UNIQUE(title)
+            )
+        `);
+
+
         prepared_statements['add_user']  = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?)');
         prepared_statements['get_rep']   = await db.prepare('SELECT rep FROM users WHERE id = ?');
         prepared_statements['set_rep'] = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET rep = excluded.rep');
         
+        prepared_statements['add_rule'] = await db.prepare('INSERT INTO rules (title, description) VALUES (?, ?)');
+        prepared_statements['get_rule'] = await db.prepare('SELECT * FROM rules WHERE title = ?');
+        prepared_statements['remove_rule'] = await db.prepare('DELETE FROM rules WHERE title = ?');
+        prepared_statements['mod_rule'] = await db.prepare('UPDATE rules SET title = ?, description = ? WHERE title = ?');
 
         prepared_statements['add_pvote'] = await db.prepare('UPDATE users SET pvote_act = ? WHERE id = ?');
         prepared_statements['get_pvote'] = await db.prepare('SELECT * FROM users WHERE id = ?');
@@ -78,6 +92,39 @@ module.exports = {
                 } catch (error) {
                     return {err: error, msg: "Failed to set reputation of user with ID " + id + " to " + amount}
                 }
+
+            case 'add_rule':
+                try {
+                    prepared_statements['add_rule'].run(command.title, command.description);
+                    return {msg: "Successfully added rule with title " + command.title}
+                } catch (error) {
+                    return {err: error, msg: "Failed to add rule with title " + command.title}
+                }
+
+            case 'get_rule':
+                try {
+                    let rule = await prepared_statements['get_rule'].get(command.title);
+                    return {title: rule.title, description: rule.description}
+                } catch (error) {
+                    return {err: error, msg: "Failed to get rule with title " + command.title}
+                }
+
+            case 'remove_rule':
+                try {
+                    prepared_statements['remove_rule'].run(command.title);
+                    return {msg: "Successfully removed rule with title " + command.title}
+                } catch (error) {
+                    return {err: error, msg: "Failed to remove rule with title " + command.title}
+                }
+
+            case 'mod_rule':
+                try {
+                    prepared_statements['mod_rule'].run(command.new_title, command.new_desc, command.title);
+                    return {msg: "Successfully modified rule with title " + command.title}
+                } catch (error) {
+                    return {err: error, msg: "Failed to modify rule with title " + command.title}
+                }
+            
             case 'add_pvote':
                 prepared_statements['add_pvote'].run(act, id);
                 return {msg: "Successfully updated user with ID " + id}
