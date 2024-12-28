@@ -7,8 +7,8 @@ info('Loading rules...');
 module.exports = {
     async add_rule(title, description) {
         try {
-            await SqliteShit.work({ cmd: 'add_rule', title: title,description: description });
-            success(`Added new rule: ${title}`);
+            const ret = await SqliteShit.work({ cmd: 'add_rule', title: title,description: description });
+            info(ret.msg);
         } catch (err) {
             error(`Failed to add rule: ${title}`, err);
         }
@@ -16,8 +16,8 @@ module.exports = {
 
     async mod_rule(index, new_title, new_description) {
         try {
-            await SqliteShit.work({ cmd: 'mod_rule', description: new_description, title: new_title, rule_id: index });
-            success(`Modified rule with index: ${index}`);
+            const ret = await SqliteShit.work({ cmd: 'mod_rule', description: new_description, title: new_title, rule_id: index });
+            info(ret.msg);
         } catch (err) {
             error(`Failed to modify rule: ${index}`, err);
         }
@@ -25,8 +25,8 @@ module.exports = {
 
     async remove_rule(index) {
         try {
-            await SqliteShit.work({ cmd: 'remove_rule', rule_id: index });
-            success(`Removed rule with index: ${index}`);
+            const ret = await SqliteShit.work({ cmd: 'remove_rule', rule_id: index });
+            info(ret.msg);
         } catch (err) {
             error(`Failed to remove rule: ${index}`, err);
         }
@@ -49,7 +49,7 @@ module.exports = {
 
             rules.forEach((rule, index) => {
                 embed.addFields({
-                    name: `${rule.title} id:${index}`,
+                    name: `${rule.title} id:${index + 1}`,
                     value: rule.description || "No description provided.",
                 });
             });

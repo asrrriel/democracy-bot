@@ -43,11 +43,11 @@ module.exports = {
 
         this.db = db;
 
-        prepared_statements['add_user'] = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?)');
+        prepared_statements['add_user'] = await db.prepare('INSERT OR IGNORE INTO users (id, rep) VALUES (?, ?)');
         prepared_statements['get_rep'] = await db.prepare('SELECT rep FROM users WHERE id = ?');
         prepared_statements['set_rep'] = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET rep = excluded.rep');
 
-        prepared_statements['add_rule'] = await db.prepare('INSERT INTO rules (id, title, description) VALUES (?, ?, ?)');
+        prepared_statements['add_rule'] = await db.prepare('INSERT OR IGNORE INTO rules (id, title, description) VALUES (?, ?, ?)');
         prepared_statements['get_rule'] = await db.prepare('SELECT * FROM rules WHERE id = ?');
         prepared_statements['remove_rule'] = await db.prepare('DELETE FROM rules WHERE id = ?');
         prepared_statements['mod_rule'] = await db.prepare('UPDATE rules SET description = ?, title = ? WHERE id = ?');
@@ -130,11 +130,18 @@ module.exports = {
 
             case 'mod_rule':
                 try {
-                    prepared_statements['mod_rule'].run(description, title, id);
-                    return { msg: "Successfully modified rule with id " + id }
+                    const result = await prepared_statements['mod_rule'].run(description, title, rule_id);
+                    
+                    // Check the result to see if rows were affected
+                    if (result.changes > 0) {
+                      return { msg: `Successfully modified rule with id ${id}` };
+                    } else {
+                      return { msg: `No rule found with id ${id}`, err: 'No changes made' };
+                    }
                 } catch (error) {
-                    return { err: error, msg: "Failed to modify rule with title " + title }
+                    return { err: error.message, msg: `Failed to modify rule with id ${id}` };
                 }
+                  
 
             case 'get_all_rules':
                 let rules = (await prepared_statements['get_all_rules']).all();
