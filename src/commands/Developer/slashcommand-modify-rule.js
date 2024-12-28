@@ -8,9 +8,9 @@ module.exports = new ApplicationCommand({
         description: 'Modifies a rule.',
         options: [
             {
-                name: 'current-title',
-                description: 'The title of the rule to modify',
-                type: ApplicationCommandOptionType.String,
+                name: 'id',
+                description: 'The index of the rule to modify',
+                type: ApplicationCommandOptionType.Number,
                 required: true
             },
             {
@@ -37,13 +37,13 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         try {
-            const title = interaction.options.getString('current-title', true);
+            const id = interaction.options.getNumber('id', true);
             const new_title = interaction.options.getString('new-title', true);
             const new_content = interaction.options.getString('new-content', true);
 
-            await Rules.mod_rule(title, new_title, new_content);
+            await Rules.mod_rule(id, new_title, new_content);
 
-            await interaction.reply({ content: `Modified rule: ${title}`, ephemeral: true });
+            await interaction.reply({ content: `Modified rule: ${new_title}`, ephemeral: true });
         } catch (err) {
             console.error("Failed to generate or send rules embed:", err);
             await interaction.reply({ content: "An error occurred while modifieng a rule", ephemeral: true });

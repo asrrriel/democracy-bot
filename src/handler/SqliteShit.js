@@ -2,6 +2,8 @@ const config = require("../config");
 
 const prepared_statements = {};
 
+let largest_rule_id = 1;
+
 module.exports = {
     setupDB: async function (db) {
         db.exec(`
@@ -10,12 +12,12 @@ module.exports = {
                 rep INTEGER,
                 pvote_act TEXT,
                 pvote_act_role TEXT,
-                pvote_act_recipient TEXT
+                pvote_act_recipient TEXT,
 
                 UNIQUE(id)
             )
         `); 
-        
+
         db.exec(`
             CREATE TABLE IF NOT EXISTS votes (
                 msg_id TEXT PRIMARY KEY,
@@ -31,8 +33,11 @@ module.exports = {
 
         db.exec(`
             CREATE TABLE IF NOT EXISTS rules (
-                title TEXT PRIMARY KEY,
-                description TEXT
+                id INTEGER PRIMARY KEY,
+                title TEXT,
+                description TEXT,
+
+                UNIQUE(id)
             )
         `);
 
@@ -42,10 +47,11 @@ module.exports = {
         prepared_statements['get_rep'] = await db.prepare('SELECT rep FROM users WHERE id = ?');
         prepared_statements['set_rep'] = await db.prepare('INSERT INTO users (id, rep) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET rep = excluded.rep');
 
-        prepared_statements['add_rule'] = await db.prepare('INSERT INTO rules (title, description) VALUES (?, ?)');
-        prepared_statements['get_rule'] = await db.prepare('SELECT * FROM rules WHERE title = ?');
-        prepared_statements['remove_rule'] = await db.prepare('DELETE FROM rules WHERE title = ?');
-        prepared_statements['mod_rule'] = await db.prepare('UPDATE rules SET description = ?, title = ? WHERE title = ?');
+        prepared_statements['add_rule'] = await db.prepare('INSERT INTO rules (id, title, description) VALUES (?, ?, ?)');
+        prepared_statements['get_rule'] = await db.prepare('SELECT * FROM rules WHERE id = ?');
+        prepared_statements['remove_rule'] = await db.prepare('DELETE FROM rules WHERE id = ?');
+        prepared_statements['mod_rule'] = await db.prepare('UPDATE rules SET description = ?, title = ? WHERE id = ?');
+
         prepared_statements['get_all_rules'] = await db.prepare('SELECT * FROM rules');
 
         prepared_statements['add_pvote'] = await db.prepare('UPDATE users SET pvote_act = ? WHERE id = ?');
@@ -66,8 +72,9 @@ module.exports = {
         let act = command.act;
         let recipient_id = command.recipient_id;
         let role_id = command.role_id;
+        let rule_id = command.rule_id;
         switch (command.cmd) {
-            case 'add_user_if_not_exists':
+            case 'add_user':
                 let rep = config.modules.reputations.starting_reputation;
                 try {
                     prepared_statements['add_user'].run(id, rep);
@@ -89,83 +96,50 @@ module.exports = {
             case 'set_rep':
                 try {
                     prepared_statements['set_rep'].run(id, command.amount);
-<<<<<<< HEAD
-                    return {msg: "Successfully set reputation of user with ID " + id + " to " + command.amount}
-                } catch (error) {
-                    return {err: error, msg: "Failed to set reputation of user with ID " + id + " to " + amount}
-=======
                     return { msg: "Successfully set reputation of user with ID " + id + " to " + command.amount }
                 } catch (error) {
                     return { err: error, msg: "Failed to set reputation of user with ID " + id + " to " + command.amount }
->>>>>>> 8560ed6ffe1050f1f8e71605aed78465bdc40b45
                 }
 
             case 'add_rule':
                 try {
-<<<<<<< HEAD
-                    prepared_statements['add_rule'].run(command.title, command.description);
-                    return {msg: "Successfully added rule with title " + command.title}
-                } catch (error) {
-                    return {err: error, msg: "Failed to add rule with title " + command.title}
-=======
-                    prepared_statements['add_rule'].run(title, description);
+                    prepared_statements['add_rule'].run(largest_rule_id++,title, description);
                     return { msg: "Successfully added rule with title " + title }
                 } catch (error) {
                     return { err: error, msg: "Failed to add rule with title " + title }
->>>>>>> 8560ed6ffe1050f1f8e71605aed78465bdc40b45
                 }
 
             case 'get_rule':
                 try {
-<<<<<<< HEAD
-                    let rule = await prepared_statements['get_rule'].get(command.title);
-                    return {title: rule.title, description: rule.description}
-                } catch (error) {
-                    return {err: error, msg: "Failed to get rule with title " + command.title}
-=======
-                    let rule = await prepared_statements['get_rule'].get(title);
+                    let rule = await prepared_statements['get_rule'].get(rule_id);
                     return { title: rule.title, description: rule.description }
                 } catch (error) {
                     return { err: error, msg: "Failed to get rule with title " + title }
->>>>>>> 8560ed6ffe1050f1f8e71605aed78465bdc40b45
                 }
 
             case 'remove_rule':
                 try {
-<<<<<<< HEAD
-                    prepared_statements['remove_rule'].run(command.title);
-                    return {msg: "Successfully removed rule with title " + command.title}
-                } catch (error) {
-                    return {err: error, msg: "Failed to remove rule with title " + command.title}
-=======
-                    prepared_statements['remove_rule'].run(title);
+                    prepared_statements['remove_rule'].run(rule_id);
+                    if(rule_id == largest_rule_id) {
+                        largest_rule_id--;
+                    }
                     return { msg: "Successfully removed rule with title " + title }
                 } catch (error) {
-                    return { err: error, msg: "Failed to remove rule with title " + title }
->>>>>>> 8560ed6ffe1050f1f8e71605aed78465bdc40b45
+                    return { err: error, msg: "Failed to remove rule with id " + id }
                 }
 
             case 'mod_rule':
                 try {
-<<<<<<< HEAD
-                    prepared_statements['mod_rule'].run(command.new_title, command.new_desc, command.title);
-                    return {msg: "Successfully modified rule with title " + command.title}
-                } catch (error) {
-                    return {err: error, msg: "Failed to modify rule with title " + command.title}
-                }
-            
-=======
-                    prepared_statements['mod_rule'].run(description, new_title, title);
-                    return { msg: "Successfully modified rule with title " + title }
+                    prepared_statements['mod_rule'].run(description, title, id);
+                    return { msg: "Successfully modified rule with id " + id }
                 } catch (error) {
                     return { err: error, msg: "Failed to modify rule with title " + title }
                 }
 
             case 'get_all_rules':
-                let rules = await prepared_statements['get_all_rules'].all();
+                let rules = (await prepared_statements['get_all_rules']).all();
                 return rules
 
->>>>>>> 8560ed6ffe1050f1f8e71605aed78465bdc40b45
             case 'add_pvote':
                 prepared_statements['add_pvote'].run(act, id);
                 return { msg: "Successfully updated user with ID " + id }

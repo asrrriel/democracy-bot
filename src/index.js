@@ -120,7 +120,7 @@ class DemocracyBot extends Client {
         for(const member of this.guilds.cache.get(config.guildId).members.cache.values()) {
             if(!member.user.bot) {
                 info(`Refreshing user with ID ${member.id}`);
-                await SqliteShit.work({cmd: 'add_user_if_not_exists', user_id: member.id});
+                await SqliteShit.work({cmd: 'add_user', user_id: member.id});
             }
         }
     }

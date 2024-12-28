@@ -8,9 +8,9 @@ module.exports = new ApplicationCommand({
         description: 'Removes a rule',
         options: [
             {
-                name: 'title',
-                description: 'The title of the rule to remove.',
-                type: ApplicationCommandOptionType.String,
+                name: 'id',
+                description: 'The index of the rule to remove.',
+                type: ApplicationCommandOptionType.Number,
                 required: true
             }
         ]
@@ -25,9 +25,9 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         try {
-            const title = interaction.options.getString('title', true);
+            const id = interaction.options.getNumber('id', true);
 
-            Rules.remove_rule(title);
+            Rules.remove_rule(id);
             await interaction.reply({ content: "Removed the rule", ephemeral: true }); // Send the embed
         } catch (err) {
             console.error("Failed to generate or send rules embed:", err);
