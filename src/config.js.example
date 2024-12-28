@@ -88,7 +88,8 @@ const config = {
     },
     strings: {
         NOT_DEVELOPER: 'You do not have the permission to run this command because you\'re not a developer of me!',
-        GUILD_COOLDOWN: 'You are currently in cooldown, you have the ability to re-use this command again in \`%cooldown%s\`.'
+        GUILD_COOLDOWN: 'You are currently in cooldown, you have the ability to re-use this command again in \`%cooldown%s\`.',
+        RULES_TITLE: '## Rules' 
     },
 
 }

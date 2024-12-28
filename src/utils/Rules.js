@@ -43,19 +43,20 @@ module.exports = {
                     .setColor(0xff0000);
             }
 
-            const embed = new EmbedBuilder()
-                .setTitle("Server Rules")
-                .setColor(0x00ff00);
+            let embeds = [];
 
             rules.forEach((rule, index) => {
-                embed.addFields({
-                    name: `${rule.title} id:${index + 1}`,
-                    value: rule.description || "No description provided.",
-                });
+                const embed = new EmbedBuilder()
+                    .setTitle(rule.title)
+                    .setColor(0x00ff00);
+
+                embed.setDescription(rule.description);
+
+                embeds.push(embed);
             });
 
             success("Created embed for rules.");
-            return embed;
+            return embeds;
         } catch (err) {
             error("Failed to create embeds for rules.", err);
             throw new Error("Error creating embeds.");

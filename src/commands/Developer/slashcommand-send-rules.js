@@ -2,6 +2,9 @@ const Rules = require("../../utils/Rules");
 const { ChatInputCommandInteraction, ApplicationCommandOptionType, AttachmentBuilder } = require("discord.js");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
+const config = require("../../config");
+
+
 module.exports = new ApplicationCommand({
     command: {
         name: 'send-rules',
@@ -18,8 +21,8 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         try {
-            const embed = await Rules.create_embeds(); // Generate the embed
-            await interaction.reply({ embeds: [embed] }); // Send the embed
+            const embeds = await Rules.create_embeds(); // Generate the embed
+            await interaction.reply({ content: config.strings.RULES_TITLE, embeds: embeds }); // Send the embed 
         } catch (err) {
             console.error("Failed to generate or send rules embed:", err);
             await interaction.reply({ content: "An error occurred while generating the rules embed.", ephemeral: true });
