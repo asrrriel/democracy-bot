@@ -21,8 +21,7 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         try {
-            const embeds = await Rules.create_embeds(); // Generate the embed
-            await interaction.reply({ content: config.strings.RULES_TITLE, embeds: embeds }); // Send the embed 
+            await Rules.send_embeds(interaction.channel.id);
         } catch (err) {
             console.error("Failed to generate or send rules embed:", err);
             await interaction.reply({ content: "An error occurred while generating the rules embed.", ephemeral: true });
