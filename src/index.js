@@ -10,7 +10,6 @@ const { Database } = require('sqlite-async');
 const { Client, Collection, Partials } = require("discord.js");
 const CommandsHandler = require("./handler/CommandsHandler");
 const { warn, error, info, success } = require("./utils/Console");
-const { onMessageUpdate } = require("./utils/Vote");
 const config = require("./config");
 const CommandsListener = require("./handler/CommandsListener");
 const ComponentsHandler = require("./handler/ComponentsHandler");
@@ -19,6 +18,7 @@ const EventsHandler = require("./handler/EventsHandler");
 const SqliteShit = require("./handler/SqliteShit");
 const Vote = require("./utils/Vote");
 const Rules = require("./utils/Rules");
+
 
 
 class DemocracyBot extends Client {
@@ -38,6 +38,8 @@ class DemocracyBot extends Client {
     commands_handler = null
     components_handler = null;
     events_handler = null;
+
+    
 
     db = null;
 
@@ -89,6 +91,7 @@ class DemocracyBot extends Client {
             index = (index + 1) % config.statusMessages.length;
         }, 20000);
     }
+
 
     connect = async () => {
         warn(`Attempting to connect to the Discord bot... (${this.login_attempts + 1})`);

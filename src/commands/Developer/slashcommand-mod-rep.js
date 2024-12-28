@@ -89,7 +89,7 @@ module.exports = new ApplicationCommand({
         await SqliteShit.work({ cmd: 'set_rep', user_id: user_id, amount: newRep });
 
         interaction.reply({
-            content: `Modified reputation for ${interaction.guild.members.cache.get(user_id).displayName}. New reputation: ${newRep}.`
+            content: "Modified reputation for `${interaction.guild.members.cache.get(user_id).displayName}`. New reputation: ${newRep}."
         });
     }
 }).toJSON();
