@@ -1,6 +1,6 @@
-const { PermissionsBitField, ChannelType } = require("discord.js");
 const config = require("../config");
-const { handleMessageCommandOptions, handleApplicationCommandOptions } = require("./CommandOptions");
+
+const { handleApplicationCommandOptions } = require("./CommandOptions");
 const ApplicationCommand = require("../structure/ApplicationCommand");
 const { error } = require("../utils/Console");
 

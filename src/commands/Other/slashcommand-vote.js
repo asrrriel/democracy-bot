@@ -4,8 +4,8 @@ const config = require("../../config");
 
 module.exports = new ApplicationCommand({
     command: {
-        name: 'request-change',
-        description: 'lets you make a vote',
+        name: 'suggest-change',
+        description: 'Lets you suggest a change',
         options: []
     },
     options: {

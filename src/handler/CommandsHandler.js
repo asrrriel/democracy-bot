@@ -16,7 +16,6 @@ class CommandsHandler {
 
                     if (!module) continue;
 
-
                     if (!module.command || !module.run) {
                         error('Unable to load the application command ' + file);
                         continue;
@@ -27,15 +26,15 @@ class CommandsHandler {
 
                     info('Loaded new application command: ' + file);
 
-                } catch(e) {
+                } catch (e) {
                     error('Unable to load a command from the path: ' + 'src/commands/' + directory + '/' + file);
                     error(e);
                 }
             }
         }
 
-        success(`Successfully loaded ${global.client.collection.application_commands.size} application commandsú.`);
-    }
+        success(`Successfully loaded ${global.client.collection.application_commands.size} application commands.`);
+    };
 
     reload = () => {
         global.client.collection.message_commands.clear();
@@ -44,17 +43,31 @@ class CommandsHandler {
         global.client.rest_application_commands_array = [];
 
         this.load();
-    }
-    
+    };
+
     /**
      * @param {{ enabled: boolean, guildId: string }} development
      * @param {Partial<import('discord.js').RESTOptions>} restOptions 
      */
-    registerApplicationCommands = async ( restOptions = null) => {
+    registerApplicationCommands = async (restOptions = null) => {
         const rest = new REST(restOptions ? restOptions : { version: '10' }).setToken(global.client.token);
 
-        await rest.put(Routes.applicationGuildCommands(global.client.user.id, config.guildId), { body: global.client.rest_application_commands_array });
-    }
+        try {
+            const registeredCommands = await rest.put(
+                Routes.applicationGuildCommands(global.client.user.id, config.guildId), 
+                { body: global.client.rest_application_commands_array }
+            );
+
+            registeredCommands.forEach(command => {
+                info(`Registered command: ${command.name}`);
+            });
+
+            success('All application commands have been registered successfully.');
+        } catch (e) {
+            error('Failed to register application commands.');
+            error(e);
+        }
+    };
 }
 
 module.exports = CommandsHandler;

@@ -17,7 +17,8 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         await interaction.reply({
-            content: `${client.collection.application_commands.map((cmd) => '\`/' + cmd.command.name + '\`').join(', ')}`
+            content: `${client.collection.application_commands.map((cmd) => '\`/' + cmd.command.name + '\`').join(', ')}`,
+            ephemeral: true
         });
     }
 }).toJSON();
