@@ -7,7 +7,7 @@ class ComponentsListener {
             const checkUserPermissions = async (component) => {
                 if (component.options?.public === false && interaction.user.id !== interaction.message.interaction.user.id) {
                     await interaction.reply({
-                        content: config.messages.COMPONENT_NOT_PUBLIC,
+                        content: config.strings.COMPONENT_NOT_PUBLIC,
                         ephemeral: true
                     });
 

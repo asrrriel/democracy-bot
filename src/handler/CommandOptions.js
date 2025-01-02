@@ -15,9 +15,9 @@ const message_commands_cooldown = new Map();
 const handleApplicationCommandOptions = async (interaction, options, command) => {
 
     if (options.botDevelopers) {
-        if (config.users?.developers?.length > 0 && !config.users?.developers?.includes(interaction.user.id)) {
+        if (config.developers.length > 0 && !config.developers.includes(interaction.user.id)) {
             await interaction.reply({
-                content: config.messages.NOT_BOT_DEVELOPER,
+                content: config.strings.NOT_BOT_DEVELOPER,
                 ephemeral: true
             });
 
@@ -76,40 +76,10 @@ const handleApplicationCommandOptions = async (interaction, options, command) =>
  * @returns {boolean}
  */
 const handleMessageCommandOptions = async (message, options, command) => {
-    if (options.botOwner) {
-        if (message.author.id !== config.users.ownerId) {
-            await message.reply({
-                content: config.messages.NOT_BOT_OWNER
-            });
-
-            return false;
-        }
-    }
-
     if (options.botDevelopers) {
         if (config.users?.developers?.length > 0 && !config.users?.developers?.includes(message.author.id)) {
             await message.reply({
-                content: config.messages.NOT_BOT_DEVELOPER
-            });
-
-            return false;
-        }
-    }
-
-    if (options.guildOwner) {
-        if (message.author.id !== message.guild.ownerId) {
-            await message.reply({
-                content: config.messages.NOT_GUILD_OWNER
-            });
-
-            return false;
-        }
-    }
-
-    if (options.nsfw) {
-        if (!message.channel.nsfw) {
-            await message.reply({
-                content: config.messages.CHANNEL_NOT_NSFW
+                content: config.strings.NOT_BOT_DEVELOPER
             });
 
             return false;
@@ -142,7 +112,7 @@ const handleMessageCommandOptions = async (message, options, command) => {
 
             if (data.some((v) => v === command.name)) {
                 await message.reply({
-                    content: config.messages.GUILD_COOLDOWN.replace(/%cooldown%/g, options.cooldown / 1000)
+                    content: config.strings.GUILD_COOLDOWN.replace(/%cooldown%/g, options.cooldown / 1000)
                 });
 
                 return false;
